@@ -1,33 +1,34 @@
 # 6. 페이셋과 어그리게이션
 
 ## 6.1 페이셋
+*[facet](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-facets.html)은 1.x 까지만 사용되고, 2.x 이후에선 Aggregations으로 대체됨*
 
 예제 6.1 hotels 인덱스 매핑 설정
 ```
-curl -XPUT http://localhost:9200/hotels/ -d '
+PUT /hotels/
 {
   "mappings" : {
     "hotel" : {
       "properties" : {
-        "name" : { "type" : "string" },
+        "name" : { "type" : "text" },
         "stars" : { "type" : "long" },
         "rooms" : { "type" : "long" },
         "location" : { "type" : "geo_point" },
-        "city" : { "type" : "string" },
-        "address" : { "type" : "string" },
+        "city" : { "type" : "text" },
+        "address" : { "type" : "text" },
         "internet" : { "type" : "boolean" },
-        "service" : { "type" : "string", "index" : "not_analyzed" },
+        "service" : { "type" : "text", "index" : false },
         "checkin": { "type" : "date" , "format" : "dateOptionalTime"}
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.2 hotels 인덱스 데이터 입력
 ```
-curl -XPOST localhost:9200/_bulk --data-binary @6_1_hotels.json
+curl -XPOST -H 'Content-Type: application/json' localhost:9200/_bulk --data-binary @6_1_hotels.json
 ```
 
 
@@ -35,7 +36,7 @@ curl -XPOST localhost:9200/_bulk --data-binary @6_1_hotels.json
 
 예제 6.3 service 필드의 텀 페이셋 검색
 ```
-$ curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "query" : {
     "term" : { "name" : "seoul" }
@@ -47,13 +48,13 @@ $ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.4 상위 3개의 텀 페이셋 검색
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "query" : {
     "term" : { "name" : "seoul" }
@@ -66,13 +67,13 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.5 페이셋을 텀의 알파벳 오름차순으로 표시
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "query" : {
     "term" : { "name" : "seoul" }
@@ -82,7 +83,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       "terms" : { "field" : "service", "order" : "term" }
     }
   }
-}'
+}
 ```
 
 
@@ -90,7 +91,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
 
 예제 6.6 stars 필드의 값을 범위별로 페이셋으로 표시
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "range_stars" : {
@@ -100,13 +101,13 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.6 stars 필드의 값을 범위별로 페이셋으로 표시 - 2
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search?pretty
 {
   "facets" : {
     "range_service" : {
@@ -115,13 +116,13 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.7 stars 필드로 간격을 구분하고 price 값을 집계한 페이셋
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "range_stars" : {
@@ -132,7 +133,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
@@ -140,7 +141,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
 
 예제 6.8 rooms 필드의 값을 100 간격으로 구분한 페이셋
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "histo_rooms" : {
@@ -150,13 +151,13 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.9 rooms 필드를 100 간격으로 구분하고 price 값을 집계한 페이셋
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "histo_rooms" : {
@@ -167,7 +168,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
@@ -175,7 +176,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
 
 예제 6.10 checkin 필드의 값을 1개월 간격으로 구분한 페이셋
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "histo_checkin" : {
@@ -185,7 +186,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
@@ -193,7 +194,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
 
 예제 6.11 텀 페이셋 결과에 service : Spa 필터 적용
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "term_name" : {
@@ -203,13 +204,13 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.12 필터 페이셋을 사용해서 service : Spa인 텀 검색
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "term_filter" : {
@@ -218,13 +219,13 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.13 질의 페이셋을 사용해서 name이 seoul 또는 hotel인 값 검색
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "term_query" : {
@@ -233,7 +234,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
@@ -241,20 +242,20 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
 
 예제 6.14 통계 페이셋을 사용해서 price 필드 정보 출력
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "my_facet" : {
       "statistical" : { "field" : "price" }
     }
   }
-}'
+}
 ```
 
 
 예제 6.15 stars 필드별로 price 필드 정보 출력
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "my_facet" : {
@@ -264,14 +265,14 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 ### 6.1.7 위치 거리 페이셋
 
 예제 6.16 geo_distance 페이셋을 이용해 3km, 6km 간격으로 호텔 분리
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "geo" : {
@@ -289,13 +290,13 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.17 거리 간격별 price 필드 값 계산
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "geo" : {
@@ -314,13 +315,13 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 
 예제 6.18 km 단위를 이용해서 거리 간격별 price 필드 값 계산
 ```
-curl 'localhost:9200/hotels/_search?pretty' -d '
+GET /hotels/_search
 {
   "facets" : {
     "geo" : {
@@ -340,7 +341,7 @@ curl 'localhost:9200/hotels/_search?pretty' -d '
       }
     }
   }
-}'
+}
 ```
 
 ## 6.2 어그리게이션
