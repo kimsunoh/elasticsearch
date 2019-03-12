@@ -131,20 +131,20 @@ GET /books/_search?q=author:jules&_source_includes=title&from=1
 
 예제 5.19 search_type=query_then_fetch로 검색
 ```
-GET /books/_search?size=1&q=author:William&search_type=query_then_fetch&_source_includes=title,author&pretty
+GET /books/_search?size=1&q=author:William&search_type=query_then_fetch&_source_includes=title,author
 ```
 
 
 예제 5.21 search_type=dfs_query_then_fetch으로 검색
 ```
-GET /books/_search?q=author:william&_source_includes=title,author&search_type=dfs_query_then_fetch&scroll=10m&pretty
+GET /books/_search?q=author:william&_source_includes=title,author&search_type=dfs_query_then_fetch&scroll=10m
 ```
 
 ## 5.3 리퀘스트 바디 검색
 
 예제 5.23 리퀘스트 바디로 author 값이 william인 값 검색
 ```
-GET /books/_search?pretty
+GET /books/_search
 {
   "query" : {
     "term" : { "author" : "william" }
@@ -156,7 +156,7 @@ GET /books/_search?pretty
 
 예제 5.24 from:1, size:2, _source:[“title”,”category”] 조건으로 전체 필드에서 time 검색
 ```
-GET /_search?pretty
+GET /_search
 {
   "from" : 1,
   "size" : 2,
@@ -168,56 +168,57 @@ GET /_search?pretty
 ```
 
 ### 5.3.2 sort
+*실습 필요. 오류로 실습하지 못함*
 
 예제 5.25 category - 내림차순, pages, title - 오름차순 순서로 검색 결과 정렬
 ```
-curl 'localhost:9200/books/_search?pretty' -d '
+GET /books/_search
 {
-  "fields" : ["title","author","category","pages"],
-  "sort" : [{"category":"desc"},"pages","title"],
+  "_source": ["title","author","category","pages"],
+  "sort" : [{"pages":"desc"},"sell"],
   "query" : {
-    "term" : { "_all" : "time" }
+    "term" : { "title" : "the" }
   }
-}'
+}
 ```
 
 
-예제 5.26 category mode: min으로 검색
+예제 5.26 pages mode: min으로 검색
 ```
-curl 'localhost:9200/books/_search?pretty' -d '
+GET /books/_search
 {
-  "fields": ["title","author","category","pages"],
-  "sort": [{"category":{"order":"desc","mode":"min"}},"pages","title"],
+  "_source": ["title","author","category","pages"],
+  "sort": [{"pages":{"order":"desc","mode":"min"}},"sell"],
   "query": {
     "term": { "category" : "science" }
   }
-}'
+}
 ```
 
 
-예제 5.27 category mode: max로 검색
+예제 5.27 pages mode: max로 검색
 ```
-curl 'localhost:9200/books/_search?pretty' -d '
+GET /books/_search
 {
-  "fields": ["title","author","category","pages"],
-  "sort": [{"category":{"order":"desc","mode":"max"}},"pages","title"],
+  "_source": ["title","author","category","pages"],
+  "sort": [{"pages":{"order":"desc","mode":"max"}},"sell"],
   "query": {
     "term": { "category" : "science" }
   }
-}'
+}
 ```
 
 
 예제 5.28 title, author 필드로 정렬. author 필드가 없어서 검색 실패
 ```
-curl 'localhost:9200/_search?pretty' -d '
+GET /_search
 {
-  "fields" : ["title","author","category"],
+  "_source" : ["title","author","category"],
   "sort" : ["title","author"],
   "query" : {
     "term" : { "title" : "time" }
   }
-}'
+}
 ```
 
 
@@ -251,38 +252,27 @@ curl 'localhost:9200/_search?pretty' -d '
 
 예제 5.31 _source: false로 설정해 도큐먼트 내용은 보이지 않게 검색
 ```
-curl 'localhost:9200/books/_search?pretty' -d '
+GET /books/_search
 {
   "_source": false,
   "query": {
     "term": { "author": "william" }
   }
-}'
+}
 ```
 
 
 예제 5.32 _source를 이용해서 title과 c로 시작하는 필드명의 값 표시
 ```
-curl 'localhost:9200/magazines/_search?pretty' -d '
+GET /magazines/_search
 {
   "_source": ["title","c*"]
-}'
-```
-
-
-예제 5.33 c로 시작하면서 ry로 끝나지 않는 필드 표시
-```
-curl 'localhost:9200/magazines/_search?pretty' -d '
-{
-  "_source": {
-    "include": "c*",
-    "exclude" : "*ry"
-  }
-}'
+}
 ```
 
 
 ### 5.3.4 partial_fields, fielddata_fields
+*실습 필요. 오류로 실습하지 못함*
 
 예제 5.34 title, category 필드 출력
 ```
@@ -306,21 +296,11 @@ curl 'localhost:9200/magazines/_search?pretty' -d '
 }'
 ```
 
-
-예제 5.36 fielddata_fields를 사용해서 title, category 필드 출력
-```
-curl 'localhost:9200/magazines/_search?pretty' -d '
-{
-  "fielddata_fields" : ["title", "category"]
-}'
-```
-
-
 ### 5.3.5 highlight
 
 예제 5.37 author 필드의 검색어 william 강조
 ```
-GET /books/_search?pretty
+GET /books/_search?
 {
   "query" : {
     "term" : { "author" : "william" }
@@ -334,7 +314,7 @@ GET /books/_search?pretty
 
 예제 5.38 strong 태그를 이용해 author 필드의 검색어 william 강조
 ```
-GET /books/_search?pretty
+GET /books/_search?
 {
   "query" : {
     "term" : { "author" : "william" }
