@@ -4,7 +4,7 @@
 ```
 curl -XPOST localhost:9200/_bulk --data-binary @5_1_books.json
 
-curl -XPOST localhost:9200/_bulk --data-binary @5_2_magazines.json
+curl -XPOST  -H "Content-Type: application/json" localhost:9200/_bulk --data-binary @5_2_magazines.json
 ```
 
 
