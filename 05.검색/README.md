@@ -12,31 +12,31 @@ curl -XPOST -H 'Content-Type: application/json' localhost:9200/_bulk --data-bina
 
 예제 5.2 books 인덱스, book 타입에서 hamlet 검색
 ```
-curl 'localhost:9200/books/book/_search?q=hamlet&pretty'
+GET /books/book/_search?q=hamlet
 ```
 
 
 예제 5.3 books 인덱스에서 hamlet 검색
 ```
-curl 'localhost:9200/books/_search?q=hamlet&pretty'
+GET /books/_search?q=hamlet
 ```
 
 
 예제 5.4 books, magazines 인덱스에서 time 검색
 ```
-curl 'localhost:9200/books,magazines/_search?q=time&pretty'
+GET /books,magazines/_search?q=time
 ```
 
 
 예제 5.5 _all을 사용해 전체 인덱스에서 time 검색
 ```
-curl 'localhost:9200/_all/_search?q=time&pretty'
+GET /_all/_search?q=time
 ```
 
 
 예제 5.6 인덱스 지정을 생략해 전체 인덱스에서 time 검색
 ```
-curl 'localhost:9200/_search?q=time&pretty'
+GET /_search?q=time
 ```
 
 
@@ -46,13 +46,13 @@ curl 'localhost:9200/_search?q=time&pretty'
 
 예제 5.7 전체 인덱스의 title 필드에서 time 검색
 ```
-curl 'localhost:9200/_search?q=title:time&pretty'
+GET /_search?q=title:time
 ```
 
 
 예제 5.8 title 필드에 검색어 time과 machine을 AND 조건으로 검색
 ```
-curl 'localhost:9200/_search?q=title:time%20AND%20machine&pretty'
+GET /_search?q=title:time AND machine
 ```
 
 
@@ -60,7 +60,7 @@ curl 'localhost:9200/_search?q=title:time%20AND%20machine&pretty'
 
 예제 5.9 df 매개변수를 사용해서 title 필드에서 time 검색
 ```
-curl 'localhost:9200/_search?q=time&df=title&pretty'
+GET /_search?q=time&df=title
 ```
 
 
@@ -68,7 +68,7 @@ curl 'localhost:9200/_search?q=time&df=title&pretty'
 
 예제 5.10 default_operator 매개변수를 사용해서 기본 조건 명령어를 AND로 지정
 ```
-curl 'localhost:9200/_search?q=title:time%20machine&default_operator=AND&pretty'
+GET /_search?q=title:time machine&default_operator=AND
 ```
 
 
@@ -76,7 +76,7 @@ curl 'localhost:9200/_search?q=title:time%20machine&default_operator=AND&pretty'
 
 예제 5.11 explain 매개변수를 사용해서 검색 처리 결과 표시
 ```
-curl 'localhost:9200/_search?q=title:time&explain&pretty'
+GET /_search?q=title:time&explain
 ```
 
 
@@ -84,15 +84,15 @@ curl 'localhost:9200/_search?q=title:time&explain&pretty'
 
 예제 5.12 _source 매개변수를 false로 설정해 도큐먼트 내용을 배제하고 검색
 ```
-curl 'localhost:9200/_search?q=title:time&_source=false&pretty'
+GET /_search?q=title:time&_source=false
 ```
 
 
-### 5.2.6 fields
+### 5.2.6 \_source_include
 
-예제 5.13 fields 매개변수를 사용해 title, author, category 필드만 출력
+예제 5.13 _source_include 매개변수를 사용해 title, author, category 필드만 출력
 ```
-curl 'localhost:9200/_search?q=title:time&fields=title,author,category&pretty'
+GET /_search?q=title:time&_source_includes=title,author,category
 ```
 
 
@@ -100,25 +100,19 @@ curl 'localhost:9200/_search?q=title:time&fields=title,author,category&pretty'
 
 예제 5.14 author 필드가 jules인 도큐먼트를 pages 필드를 기준으로 오름차순 정렬
 ```
-curl 'localhost:9200/books/_search?q=author:jules&sort=pages&pretty'
+GET /books/_search?q=author:jules&sort=pages
 ```
 
 
 예제 5.15 author 필드가 jules인 도큐먼트를 pages 필드를 기준으로 내림차순 정렬
 ```
-curl 'localhost:9200/books/_search?q=author:jules&sort=pages:desc&pretty'
+GET /books/_search?q=author:jules&sort=pages:desc
 ```
 
 
-예제 5.16 author 필드가 jules인 도큐먼트를 title 필드를 기준으로 오름차순 정렬
+예제 5.16 author 필드가 jules인 도큐먼트를 _score 를 기준으로 오름차순 정렬
 ```
-curl 'localhost:9200/books/_search?q=author:jules&fields=title&sort=title&pretty'
-```
-
-
-예제 5.17 author 필드가 jules인 도큐먼트를 title 필드를 기준으로 내림차순 정렬
-```
-curl 'localhost:9200/books/_search?q=author:jules&fields=title&sort=title:desc&pretty'
+GET /books/_search?q=author:jules&_source_includes=title&sort=_score:asc
 ```
 
 
@@ -128,7 +122,7 @@ curl 'localhost:9200/books/_search?q=author:jules&fields=title&sort=title:desc&p
 
 예제 5.18 from 매개변수를 사용해서 2번째 결과부터 표시
 ```
-curl 'localhost:9200/books/_search?q=author:jules&fields=title&from=1&pretty'
+GET /books/_search?q=author:jules&_source_includes=title&from=1
 ```
 
 ### 5.2.10 size
@@ -137,52 +131,40 @@ curl 'localhost:9200/books/_search?q=author:jules&fields=title&from=1&pretty'
 
 예제 5.19 search_type=query_then_fetch로 검색
 ```
-curl 'localhost:9200/books/_search?size=1&q=author:William&search_type=query_then_fetch&fields=title,author&pretty'
+GET /books/_search?size=1&q=author:William&search_type=query_then_fetch&_source_includes=title,author&pretty
 ```
 
 
-예제 5.20 search_type=query_and_fetch로 검색
+예제 5.21 search_type=dfs_query_then_fetch으로 검색
 ```
-curl 'localhost:9200/books/_search?size=1&q=author:William&search_type=query_and_fetch&fields=title,author&pretty'
-```
-
-
-예제 5.21 search_type=scan으로 검색
-```
-curl 'localhost:9200/books/_search?q=author:william&fields=title,author&search_type=scan&scroll=10m&pretty'
-```
-
-
-예제 5.22 _scroll_id로 검색한 결과 출력
-```
-curl 'localhost:9200/_search/scroll/c2Nhbjs1OzUxOnpnazlUWENRUTJ5TURiU3BfUGlLQXc7NTI6emdrOVRYQ1FRMnlNRGJTcF9QaUtBdzs1Mzp6Z2s5VFhDUVEyeU1EYlNwX1BpS0F3OzUxOjhsZlJpemZIVDQ2R1JvZjR3SHdWcmc7NTI6OGxmUml6ZkhUNDZHUm9mNHdId1ZyZzsxO3RvdGFsX2hpdHM6Njs=?pretty'
+GET /books/_search?q=author:william&_source_includes=title,author&search_type=dfs_query_then_fetch&scroll=10m&pretty
 ```
 
 ## 5.3 리퀘스트 바디 검색
 
 예제 5.23 리퀘스트 바디로 author 값이 william인 값 검색
 ```
-curl 'localhost:9200/books/_search?pretty' -d '
+GET /books/_search?pretty
 {
   "query" : {
     "term" : { "author" : "william" }
   }
-}'
+}
 ```
 
 ### 5.3.1 size, from, fields
 
-예제 5.24 from:1, size:2, fields:[“title”,”category”] 조건으로 전체 필드에서 time 검색
+예제 5.24 from:1, size:2, _source:[“title”,”category”] 조건으로 전체 필드에서 time 검색
 ```
-curl 'localhost:9200/_search?pretty' -d '
+GET /_search?pretty
 {
-  from : 1,
-  size : 2,
-  fields : ["title","category"],
+  "from" : 1,
+  "size" : 2,
+  "_source": ["title","category"],
   "query" : {
-    "term" : { "_all" : "time" }
+    "term" : {  "author" : "william"  }
   }
-}'
+}
 ```
 
 ### 5.3.2 sort
@@ -338,7 +320,7 @@ curl 'localhost:9200/magazines/_search?pretty' -d '
 
 예제 5.37 author 필드의 검색어 william 강조
 ```
-curl 'localhost:9200/books/_search?pretty' -d '
+GET /books/_search?pretty
 {
   "query" : {
     "term" : { "author" : "william" }
@@ -346,13 +328,13 @@ curl 'localhost:9200/books/_search?pretty' -d '
   "highlight" : {
     "fields" : { "author" : {} }
   }
-}'
+}
 ```
 
 
 예제 5.38 strong 태그를 이용해 author 필드의 검색어 william 강조
 ```
-curl 'localhost:9200/books/_search?pretty' -d '
+GET /books/_search?pretty
 {
   "query" : {
     "term" : { "author" : "william" }
@@ -362,5 +344,5 @@ curl 'localhost:9200/books/_search?pretty' -d '
     "post_tags" : ["</strong>"],
     "fields" : { "author" : { } }
   }
-}'
+}
 ```
