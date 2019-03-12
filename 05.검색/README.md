@@ -2,9 +2,9 @@
 
 예제 5.1 5_1_books.json 파일 내용을 벌크 API로 입력
 ```
-curl -XPOST localhost:9200/_bulk --data-binary @5_1_books.json
+curl -XPOST -H 'Content-Type: application/json' localhost:9200/_bulk --data-binary @5_1_books.json
 
-curl -XPOST  -H "Content-Type: application/json" localhost:9200/_bulk --data-binary @5_2_magazines.json
+curl -XPOST -H 'Content-Type: application/json' localhost:9200/_bulk --data-binary @5_2_magazines.json
 ```
 
 
